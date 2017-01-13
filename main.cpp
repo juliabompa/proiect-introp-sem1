@@ -47,8 +47,6 @@ int main()
 			final= desfasurareJoc(12, 13, 10);
 			if(final)
 				cout<<"		CONGRATULATIONS!!!	";
-			else
-				cout<<"		BANG BANG YOU'RE DEAD!	";
 			
 			break;
 		case 'i':
@@ -59,8 +57,6 @@ int main()
 			final=desfasurareJoc(19, 20, 40);
 			if(final)
 				cout<<"		CONGRATULATIONS!!!	";
-			else
-				cout<<"		BANG BANG YOU'RE DEAD!	";
 			
 			break;
 		case 'e':
@@ -71,14 +67,12 @@ int main()
 			final=desfasurareJoc(19, 34, 99);
 			if(final)
 				cout<<"		CONGRATULATIONS!!!	";
-			else
-				cout<<"		BANG BANG YOU'RE DEAD!	";
 			
 			break;
 		default:
 			cout<<"blabla";
 	}
-
+	system("pause");
 	return 0;
 }
 
@@ -187,35 +181,6 @@ void Mine(int a, int b)
 								numere[i][j]++;
 }
 
-
-void afisare(int a, int b)
-{
-	int i, j;
-	for(i=0;i<a;i++)
-	{
-		for(j=0;j<b;j++)
-			cout<<mine[i][j]<<" ";
-		cout<<endl;
-	}
-
-	cout<<endl;
-	for(i=0;i<a;i++)
-	{
-		for(j=0;j<b;j++)
-			cout<<numere[i][j]<<" ";
-		cout<<endl;
-	}
-
-	cout<<endl;
-	for(i=0;i<a;i++)
-	{
-		for(j=0;j<b;j++)
-			cout<<joc[i][j]<<" ";
-		cout<<endl;
-	}
-}
-
-
 int desfasurareJoc(int x, int y, int numarBombe)
 {
 	
@@ -225,13 +190,18 @@ int desfasurareJoc(int x, int y, int numarBombe)
 
 	do
 	{
-		cin>>mutare.primaCoordonata>>mutare.aDouaCoordonata>>mutare.actiune;
-		a=mutare.primaCoordonata+1, b=(int)mutare.aDouaCoordonata-'a'+3;
-		while(a<2||a>11||b<2||b>11||(mutare.actiune!='s'&&mutare.actiune!='d'&&mutare.actiune!='f'))
+		do
 		{
 			cin>>mutare.primaCoordonata>>mutare.aDouaCoordonata>>mutare.actiune;
-			a=mutare.primaCoordonata+1, b=(int)mutare.aDouaCoordonata-'a'+2;
-		}
+			a=mutare.primaCoordonata+1; 
+			if(mutare.aDouaCoordonata>='a')
+				b=(int)mutare.aDouaCoordonata-'a'+3;
+			else
+				b=(int)mutare.aDouaCoordonata-'A' + 3 + 26;
+		}while(a<2||a>x-1||b<2||b>y-1 || (mutare.actiune!='s'&&mutare.actiune!='d'&&mutare.actiune!='f') 
+			|| mutare.actiune=='s' && joc[a][b] != 254 
+			|| mutare.actiune=='f' && (joc[a][b] != 254 && joc[a][b]!='+') 
+			|| mutare.actiune=='d' && joc[a][b] == 254);
 
 		if(mutare.actiune=='s')
 		{
@@ -239,39 +209,30 @@ int desfasurareJoc(int x, int y, int numarBombe)
 			{
 				for(i=2;i<x-1;i++)
 					for(j=2;j<y-1;j++)
-						if(numere[i][j]=='*')
+					{	
+						if(numere[i][j]=='*' && joc[i][j]!='+')
 							joc[i][j]='*';
+						if(joc[i][j]=='+' && numere[i][j]!='*')
+							joc[i][j]='x';
+					}
+				afisare(x,y);
 				cout<<endl<<"	"<<"BANG BANG YOU'RE DEAD"<<endl<<endl;
-				for(i=0;i<x;i++)
-				{
-					for(j=0;j<y;j++)
-						cout<<joc[i][j]<<" ";
-					cout<<endl;
-				}
+				
 				ok=0;
 			}
 			else
 				if(numere[a][b]>'0' && numere[a][b]<='9')
 				{
 					joc[a][b]=numere[a][b];
-					for(i=0;i<x;i++)
-					{
-						for(j=0;j<y;j++)
-							cout<<joc[i][j]<<" ";
-						cout<<endl;
-					}
+
+					afisare(x,y);
 				}
 				else
 				{
 					joc[a][b]=' ';
 					q.push_back(make_pair(a,b));
 					coada();
-					for(i=0;i<x;i++)
-					{
-						for(j=0;j<y;j++)
-							cout<<joc[i][j]<<" ";
-						cout<<endl;
-					}
+					afisare(x,y);
 				}
 		}
 		else
@@ -279,12 +240,9 @@ int desfasurareJoc(int x, int y, int numarBombe)
 			{
 				if(joc[a][b]==254)
 					joc[a][b]='+';
-				for(i=0;i<x;i++)
-				{
-					for(j=0;j<y;j++)
-						cout<<joc[i][j]<<" ";
-					cout<<endl;
-				}
+				else
+					joc[a][b]=254;
+				afisare(x,y);
 			}
 			else
 			{
@@ -325,22 +283,23 @@ int desfasurareJoc(int x, int y, int numarBombe)
 					{
 						for(i=2;i<x-1;i++)
 							for(j=2;j<y-1;j++)
-								if(numere[i][j]=='*')
+								if(numere[i][j]=='*' && joc[i][j]!='+')
 									joc[i][j]='*';
+					}
+					afisare(x, y);
+					if(ok==0)
 						cout<<endl<<"	BANG BANG YOU'RE DEAD	"<<endl<<endl;
-					}
-					for(i=0;i<x;i++)
-					{
-						for(j=0;j<y;j++)
-							cout<<joc[i][j]<<" ";
-						cout<<endl;
-					}
 				}
 			}
+			contor=0;
 			for(i=2;i<x-1;i++)
+			{
 				for(j=3;j<y-1;j++)
+				{
 					if(joc[i][j]=='+'||joc[i][j]==254)
 						contor++;
+				}
+			}
 			if(contor==numarBombe)
 				break;
 	}while(ok);
@@ -350,3 +309,16 @@ int desfasurareJoc(int x, int y, int numarBombe)
 		return 0;
 }
 
+void afisare(int a, int b)
+{
+	int i, j;
+	if (system("CLS")) 
+		system("clear");
+	cout<<endl;
+	for(i=0;i<a;i++)
+	{
+		for(j=0;j<b;j++)
+			cout<<joc[i][j]<<" ";
+		cout<<endl;
+	}
+}
