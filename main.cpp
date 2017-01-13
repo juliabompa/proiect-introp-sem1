@@ -15,14 +15,19 @@ unsigned char mine[20][34], numere[20][34], joc[20][34];
 
 int main()
 {
-	int i, j, k, l;
+	int i, j, k, l, a, b, x, y, ok=1, flags;
+
+	char pas;
+
+	Mutare mutare;
+
 	deque<pair<int, int> >q;
+
 	cout<<endl;
-	cout<<"		INSTRUCTIUNI JOC";
+	cout<<"		INSTRUCTIUNI JOC	";
 	cout<<endl<<endl;
 	cout<<" ";
 
-	char pas;
 	cin>>pas;
 	while(pas!= 'b' && pas!= 'i' && pas!= 'e')
 		cin>>pas;
@@ -91,6 +96,151 @@ int main()
 					cout<<numere[i][j]<<" ";
 				cout<<endl;
 			}
+
+			do
+			{
+				cin>>mutare.primaCoordonata>>mutare.aDouaCoordonata>>mutare.actiune;
+				a=mutare.primaCoordonata+1, b=(int)mutare.aDouaCoordonata-'a'+2;
+				while(a<2||a>11||b<2||b>11||(mutare.actiune!='s'&&mutare.actiune!='d'&&mutare.actiune!='f'))
+				{
+					cin>>mutare.primaCoordonata>>mutare.aDouaCoordonata>>mutare.actiune;
+					a=mutare.primaCoordonata+1, b=(int)mutare.aDouaCoordonata-'a'+2;
+				}
+
+				if(mutare.actiune=='s')
+				{
+					if(numere[a][b]=='*')
+					{
+						for(i=2;i<11;i++)
+							for(j=2;j<11;j++)
+								if(numere[i][j]=='*')
+									joc[i][j]='*';
+						cout<<endl<<"	"<<"BANG BANG YOU'RE DEAD"<<endl<<endl;
+						for(i=0;i<12;i++)
+						{
+							for(j=0;j<12;j++)
+								cout<<joc[i][j]<<" ";
+							cout<<endl;
+						}
+						ok=0;
+					}
+					else
+						if(numere[a][b]>'0' && numere[a][b]<='9')
+						{
+							joc[a][b]=numere[a][b];
+							for(i=0;i<12;i++)
+							{
+								for(j=0;j<12;j++)
+									cout<<joc[i][j]<<" ";
+								cout<<endl;
+							}
+						}
+						else
+						{
+							joc[a][b]=' ';
+							q.push_back(make_pair(a,b));
+							while(!q.empty())
+							{
+								x=q.front().first;
+								y=q.front().second;
+								for(i=x-1;i<=x+1;i++)
+									for(j=y-1;j<=y+1;j++)
+										if(numere[i][j]=='0' && joc[i][j] == 254)
+										{
+											joc[i][j]=' ';
+											q.push_back(make_pair(i,j));
+										}
+										else
+											if(numere[i][j]>'0' && numere[i][j]<='9')
+												joc[i][j]=numere[i][j];
+								q.pop_front();
+							}
+							for(i=0;i<12;i++)
+							{
+								for(j=0;j<12;j++)
+									cout<<joc[i][j]<<" ";
+								cout<<endl;
+							}
+						}
+				}
+				else
+					if(mutare.actiune=='f')
+					{
+						joc[a][b]='+';
+						for(i=0;i<12;i++)
+						{
+							for(j=0;j<12;j++)
+								cout<<joc[i][j]<<" ";
+							cout<<endl;
+						}
+					}
+					else
+					{
+						flags=0;
+						ok=1;
+						if(joc[a][b]>'0'&&joc[a][b]<='9')
+						{
+							for(i=a-1;i<=a+1;i++)
+								for(j=b-1;j<=b+1;j++)
+									if(joc[i][j]=='+')
+										flags++;
+							if(flags==(int)joc[a][b]-'0')
+							{
+								for(i=a-1;i<=a+1;i++)
+									for(j=b-1;j<=b+1;j++)
+									{
+										if(joc[i][j]=='+' && numere[i][j]!='*')
+										{
+											ok=0;
+											joc[i][j]='x';
+										}
+										else
+											if(joc[i][j]==254)
+											{
+												if(numere[i][j]=='0')
+												{
+													joc[i][j]=' ';
+													q.push_back(make_pair(i,j));
+													while(!q.empty())
+													{
+														x=q.front().first;
+														y=q.front().second;
+														for(k=x-1;k<=x+1;k++)
+															for(l=y-1;l<=y+1;l++)
+																if(numere[k][l]=='0' && joc[k][l] == 254)
+																{
+																	joc[k][l]=' ';
+																	q.push_back(make_pair(k,l));
+																}
+																else
+																	if(numere[k][l]>'0' && numere[k][l]<='9')
+																		joc[k][l]=numere[k][l];
+														q.pop_front();
+													}
+												}
+												else
+													if(numere[i][j]<='9' && numere[i][j]>'0')
+														joc[i][j]=numere[i][j];
+											}
+									}
+							}
+							if(ok==0)
+							{
+								for(i=2;i<11;i++)
+									for(j=2;j<11;j++)
+										if(numere[i][j]=='*')
+											joc[i][j]='*';
+								cout<<endl<<"	BANG BANG YOU'RE DEAD	"<<endl<<endl;
+							}
+							for(i=0;i<12;i++)
+							{
+								for(j=0;j<12;j++)
+									cout<<joc[i][j]<<" ";
+								cout<<endl;
+							}
+						}
+					}
+			}while(ok);
 			break;
 		case 'i':
 			for(i=0;i<20;i++)
@@ -252,96 +402,90 @@ int main()
 			cout<<"blabla";
 	}
 
-	
-	for(i=0;i<12;i++)
-	{
-		for(j=0;j<12;j++)
-			cout<<joc[i][j]<<" ";
-		cout<<endl;
-	} 
-
-	Mutare mutare;
-	//int ok=1;
-
-	int a, b, x, y;
-	cin>>mutare.primaCoordonata>>mutare.aDouaCoordonata>>mutare.actiune;
-	a=mutare.primaCoordonata+1, b=(int)mutare.aDouaCoordonata-'a'+2;
-	while(a<2||a>11||b<2||b>11||(mutare.actiune!='s'&&mutare.actiune!='d'&&mutare.actiune!='f'))
+	/*do
 	{
 		cin>>mutare.primaCoordonata>>mutare.aDouaCoordonata>>mutare.actiune;
-	    a=mutare.primaCoordonata+1, b=(int)mutare.aDouaCoordonata-'a'+2;
-	}
-
-	if(mutare.actiune=='s')
-	{
-		if(numere[a][b]=='*')
+		a=mutare.primaCoordonata+1, b=(int)mutare.aDouaCoordonata-'a'+2;
+		while(a<2||a>11||b<2||b>11||(mutare.actiune!='s'&&mutare.actiune!='d'&&mutare.actiune!='f'))
 		{
-			for(i=2;i<11;i++)
-				for(j=2;j<11;j++)
-					if(numere[i][j]=='*')
-						joc[i][j]='*';
-			cout<<endl<<"	"<<"BANG BANG YOU'RE DEAD"<<endl<<endl;
-			for(i=0;i<12;i++)
-			{
-				for(j=0;j<12;j++)
-					cout<<joc[i][j]<<" ";
-				cout<<endl;
-			}
-			return 0;
+			cin>>mutare.primaCoordonata>>mutare.aDouaCoordonata>>mutare.actiune;
+			a=mutare.primaCoordonata+1, b=(int)mutare.aDouaCoordonata-'a'+2;
 		}
-		else
-			if(numere[a][b]>'0' && numere[a][b]<='9')
+
+		if(mutare.actiune=='s')
+		{
+			if(numere[a][b]=='*')
 			{
-				joc[a][b]=numere[a][b];
+				for(i=2;i<11;i++)
+					for(j=2;j<11;j++)
+						if(numere[i][j]=='*')
+							joc[i][j]='*';
+				cout<<endl<<"	"<<"BANG BANG YOU'RE DEAD"<<endl<<endl;
 				for(i=0;i<12;i++)
 				{
 					for(j=0;j<12;j++)
 						cout<<joc[i][j]<<" ";
 					cout<<endl;
 				}
+				ok=0;
+			}
+			else
+				if(numere[a][b]>'0' && numere[a][b]<='9')
+				{
+					joc[a][b]=numere[a][b];
+					for(i=0;i<12;i++)
+					{
+						for(j=0;j<12;j++)
+							cout<<joc[i][j]<<" ";
+						cout<<endl;
+					}
+				}
+				else
+				{
+					joc[a][b]=' ';
+					q.push_back(make_pair(a,b));
+					while(!q.empty())
+					{
+						x=q.front().first;
+						y=q.front().second;
+						for(i=x-1;i<=x+1;i++)
+							for(j=y-1;j<=y+1;j++)
+									if(numere[i][j]=='0' && joc[i][j] == 254)
+									{
+										joc[i][j]=' ';
+										q.push_back(make_pair(i,j));
+									}
+									else
+										if(numere[i][j]>'0' && numere[i][j]<='9')
+											joc[i][j]=numere[i][j];
+						q.pop_front();
+					}
+					for(i=0;i<12;i++)
+					{
+						for(j=0;j<12;j++)
+							cout<<joc[i][j]<<" ";
+						cout<<endl;
+					}
+				}
+		}
+		else
+			if(mutare.actiune=='f')
+			{
+				joc[a][b]='+';
+				for(i=0;i<12;i++)
+					{
+						for(j=0;j<12;j++)
+							cout<<joc[i][j]<<" ";
+						cout<<endl;
+					}
 			}
 			else
 			{
-				joc[a][b]=' ';
-				q.push_back(make_pair(a,b));
-				while(!q.empty())
-				{
-					x=q.front().first;
-					y=q.front().second;
-					for(i=x-1;i<=x+1;i++)
-						for(j=y-1;j<=y+1;j++)
-								if(numere[i][j]=='0' && joc[i][j] == 254)
-								{
-									joc[i][j]=' ';
-									q.push_back(make_pair(i,j));
-								}
-								else
-									if(numere[i][j]>'0' && numere[i][j]<='9')
-										joc[i][j]=numere[i][j];
-					q.pop_front();
-				}
-				for(i=0;i<12;i++)
-				{
-					for(j=0;j<12;j++)
-						cout<<joc[i][j]<<" ";
-					cout<<endl;
-				}
-			}
-	}
-	else
-		if(mutare.actiune=='f')
-		{
-			joc[a][b]='+';
-			for(i=0;i<12;i++)
-				{
-					for(j=0;j<12;j++)
-						cout<<joc[i][j]<<" ";
-					cout<<endl;
-				}
-		}
-		else
-		{
 
-		}
+			}
+	}while(ok);
+	if(ok==0)
+	{*/
+
 	return 0;
 }
